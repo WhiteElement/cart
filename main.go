@@ -12,8 +12,8 @@ func main() {
 	port := 420
 
 	http.HandleFunc("/shoppinglist", shoppinglist.ChooseHandler)
-	http.HandleFunc("/shoppinglist", item.ChooseHandler)
+	http.HandleFunc("/item", item.ChooseHandler)
 
-	fmt.Printf("Listening on port %d", port)
+	fmt.Printf("Listening on port %d\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }

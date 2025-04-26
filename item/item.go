@@ -30,17 +30,17 @@ func getAllHandler(w http.ResponseWriter, r *http.Request) {
 func newHandler(w http.ResponseWriter, r *http.Request) {
 	item, err := itemFromBody(w, r)
 	if err != nil {
-		reqResponse.WriteErr(w, 400, []byte(err.Error()))
+		reqResponse.WriteErr(w, 400, err.Error())
 		return
 	}
 
 	if item.Id == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Id for Item provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Item provided"))
 		return
 	}
 
 	if len(item.Name) == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
 		return
 	}
 
@@ -51,12 +51,12 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 func updateHandler(w http.ResponseWriter, r *http.Request) {
 	item, err := itemFromBody(w, r)
 	if err != nil {
-		reqResponse.WriteErr(w, 400, []byte(err.Error()))
+		reqResponse.WriteErr(w, 400, err.Error())
 		return
 	}
 
 	if item.Id == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Id for Item provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Item provided"))
 		return
 	}
 

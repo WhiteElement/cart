@@ -28,23 +28,18 @@ func ChooseHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
-	payload, err := reqResponse.VerifyBody(w, r)
+	shoppinglist, err := listFromBody(w, r)
 	if err != nil {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf(err.Error()))
 		return
 	}
 
-	var shoppinglist Shoppinglist
-	err = json.Unmarshal(payload, &shoppinglist)
-	if err != nil {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nCould not unmarshal payload: '%s'", payload)))
-	}
-
 	if shoppinglist.Id == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Shoppinglist provided"))
 	}
 
 	if len(shoppinglist.Name) == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
 	}
 
 	//TODO:
@@ -55,23 +50,34 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllHandler(w http.ResponseWriter, r *http.Request) {
+	//TODO: get all from database
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
-	payload, err := reqResponse.VerifyBody(w, r)
+	shoppinglist, err := listFromBody(w, r)
 	if err != nil {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf(err.Error()))
 		return
 	}
 
-	var shoppinglist Shoppinglist
-	err = json.Unmarshal(payload, &shoppinglist)
-	if err != nil {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nCould not unmarshal payload: '%s'", payload)))
-	}
-
 	if len(shoppinglist.Name) == 0 {
-		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
 	}
 
 	//TODO: save to database
+}
+
+func listFromBody(w http.ResponseWriter, r *http.Request) (Shoppinglist, error) {
+	payload, err := reqResponse.VerifyBody(w, r)
+	if err != nil {
+		return Shoppinglist{}, err
+	}
+
+	var list Shoppinglist
+	err = json.Unmarshal(payload, &list)
+	if err != nil {
+		return Shoppinglist{}, err
+	}
+
+	return list, nil
 }

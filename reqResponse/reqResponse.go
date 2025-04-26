@@ -12,10 +12,10 @@ func Write(w http.ResponseWriter, statusCode int, body []byte) {
 	w.Write(body)
 }
 
-func WriteErr(w http.ResponseWriter, statusCode int, body []byte) {
-	log.Println(body)
+func WriteErr(w http.ResponseWriter, statusCode int, msg string) {
+	log.Printf("Error: %s\n", msg)
 	w.WriteHeader(statusCode)
-	w.Write(body)
+	w.Write([]byte(msg))
 }
 
 func VerifyBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
