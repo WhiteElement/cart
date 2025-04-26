@@ -39,6 +39,10 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nCould not unmarshal payload: '%s'", payload)))
 	}
 
+	if shoppinglist.Id == 0 {
+		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
+	}
+
 	if len(shoppinglist.Name) == 0 {
 		reqResponse.WriteErr(w, 400, []byte(fmt.Sprintf("\nNo Name for Shoppinglist provided")))
 	}
