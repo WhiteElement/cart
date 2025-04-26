@@ -10,7 +10,7 @@ import (
 func main() {
 	port := 420
 
-	http.HandleFunc("/shoppinglist", shoppinglist.DecideShoppingHandler)
+	http.HandleFunc("/shoppinglist", shoppinglist.ChooseHandler)
 
 	fmt.Printf("Listening on port %d", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
