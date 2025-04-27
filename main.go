@@ -11,7 +11,6 @@ import (
 	"os"
 	"strconv"
 
-	"database/sql"
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
@@ -44,10 +43,21 @@ func main() {
 		port = 420
 	}
 
-	connString := ConnString()
-	db, err := sql.Open("postgres", connString)
+	conn := NewConn()
+	_, err = conn.Exec("INSERT INTO public.\"Items\" (\"Name\") VALUES ('Test')")
 	if err != nil {
-		log.Fatalf("Could no connect to database:\nconnString: '%s'\nDatabase: '+%v'", connString, db)
+		log.Printf("Error inserting: %s\n", err.Error())
+	}
+
+	rows, err := conn.Query("select * from public.\"Items\"")
+	if err != nil {
+		log.Printf("Error querying: %s\n", err.Error())
+	}
+
+	for rows.Next() {
+		var item item.Item
+		rows.Scan(&item.Id, &item.Name)
+		log.Printf("Item: +%v\n", item)
 	}
 
 	// TODO: postgres nur für bestimmte IPs freigeben
