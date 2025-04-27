@@ -44,21 +44,8 @@ func main() {
 	}
 
 	conn := NewConn()
-	_, err = conn.Exec("INSERT INTO public.\"Items\" (\"Name\") VALUES ('Test')")
-	if err != nil {
-		log.Printf("Error inserting: %s\n", err.Error())
-	}
-
-	rows, err := conn.Query("select * from public.\"Items\"")
-	if err != nil {
-		log.Printf("Error querying: %s\n", err.Error())
-	}
-
-	for rows.Next() {
-		var item item.Item
-		rows.Scan(&item.Id, &item.Name)
-		log.Printf("Item: +%v\n", item)
-	}
+	conn.Insert(Items, []string{"Name"}, []string{"Test no. 2"})
+	conn.Insert(Items, []string{"Name"}, []string{"Test no. 3"})
 
 	// TODO: postgres nur für bestimmte IPs freigeben
 	log.Printf("Listening on port %d\n", port)
