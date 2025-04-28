@@ -1,7 +1,8 @@
 package main
 
 import (
-	"cartv2/cart/item"
+	"cartv2/cart/db"
+	"cartv2/cart/item/itemhandler"
 	"cartv2/cart/shoppinglist"
 	"embed"
 	"fmt"
@@ -31,21 +32,20 @@ func main() {
 		log.Fatal(err)
 	}
 
+	conn := db.NewConn()
+	itemhandler := itemhandler.Itemhandler{Conn: conn}
+
 	staticFS, _ := fs.Sub(staticFolder, "static")
 
 	http.Handle("/", http.FileServer(http.FS(staticFS)))
 	http.HandleFunc("/shoppinglist", shoppinglist.ChooseHandler)
-	http.HandleFunc("/item", item.ChooseHandler)
+	http.HandleFunc("/item", itemhandler.Choose)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
 		log.Println("No PORT Env variable found, setting 420 as a default value")
 		port = 420
 	}
-
-	conn := NewConn()
-	conn.Insert(Items, []string{"Name"}, []string{"Test no. 2"})
-	conn.Insert(Items, []string{"Name"}, []string{"Test no. 3"})
 
 	// TODO: postgres nur für bestimmte IPs freigeben
 	log.Printf("Listening on port %d\n", port)

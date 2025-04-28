@@ -1,6 +1,7 @@
-package main
+package db
 
 import (
+	"cartv2/cart/item/item"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -44,6 +45,22 @@ func (db DB) Insert(table string, cols []string, values []string) error {
 	_, err := db.conn.Exec(query)
 
 	return err
+}
+
+func (db DB) QueryAllItems() []item.Item {
+	rows, err := db.conn.Query(fmt.Sprintf("SELECT * FROM %s", Items))
+	var items []item.Item
+	if err != nil {
+		return items
+	}
+
+	for rows.Next() {
+		var item item.Item
+		rows.Scan(&item.Id, &item.Name)
+		items = append(items, item)
+	}
+
+	return items
 }
 
 func format(collection []string, surroundings string) string {

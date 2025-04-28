@@ -1,33 +1,34 @@
-package item
+package itemhandler
 
 import (
+	"cartv2/cart/db"
+	"cartv2/cart/item/item"
 	"cartv2/cart/reqResponse"
 	"encoding/json"
 	"fmt"
 	"net/http"
 )
 
-type Item struct {
-	Id   int
-	Name string
+type Itemhandler struct {
+	Conn db.DB
 }
 
-func ChooseHandler(w http.ResponseWriter, r *http.Request) {
+func (i Itemhandler) Choose(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		getAllHandler(w, r)
+		i.getAllHandler(w, r)
 	case "POST":
-		newHandler(w, r)
+		i.newHandler(w, r)
 	case "PATCH":
-		updateHandler(w, r)
+		i.updateHandler(w, r)
 	}
 }
 
-func getAllHandler(w http.ResponseWriter, r *http.Request) {
+func (i Itemhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	//TODO: get All from database
 }
 
-func newHandler(w http.ResponseWriter, r *http.Request) {
+func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 	item, err := itemFromBody(w, r)
 	if err != nil {
 		reqResponse.WriteErr(w, 400, err.Error())
@@ -48,7 +49,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func updateHandler(w http.ResponseWriter, r *http.Request) {
+func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	item, err := itemFromBody(w, r)
 	if err != nil {
 		reqResponse.WriteErr(w, 400, err.Error())
@@ -64,17 +65,17 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	// Get from database, update, save again
 }
 
-func itemFromBody(w http.ResponseWriter, r *http.Request) (Item, error) {
+func itemFromBody(w http.ResponseWriter, r *http.Request) (item.Item, error) {
 	payload, err := reqResponse.VerifyBody(w, r)
 	if err != nil {
-		return Item{}, err
+		return item.Item{}, err
 	}
 
-	var item Item
-	err = json.Unmarshal(payload, &item)
+	var i item.Item
+	err = json.Unmarshal(payload, &i)
 	if err != nil {
-		return Item{}, err
+		return item.Item{}, err
 	}
 
-	return item, nil
+	return i, nil
 }
