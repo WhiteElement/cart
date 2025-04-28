@@ -35,6 +35,11 @@ func (i Itemhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	reqResponse.Write(w, 200, content)
 }
 
+// TODO:
+// 1. secondary key für item -> Liste
+// 2. checked column einfügen
+// 3. alle EPs updaten
+
 func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 	it, err := itemFromBody(w, r)
 	if err != nil {

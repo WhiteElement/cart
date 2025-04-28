@@ -16,6 +16,7 @@ type DB struct {
 
 const (
 	Items string = "public.\"Items\""
+	Lists string = "public.\"Lists\""
 )
 
 func connString() string {
@@ -76,8 +77,3 @@ func format(collection []string, surroundings string) string {
 
 	return sb.String()[:sb.Len()-len(SEP)]
 }
-
-// rows, err := conn.Query("select * from public.\"Items\"")
-// if err != nil {
-// 	log.Printf("Error querying: %s\n", err.Error())
-// }

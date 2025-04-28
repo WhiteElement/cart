@@ -14,6 +14,7 @@ type Shoppinglist struct {
 	Name    string
 	Items   []item.Item
 	Created time.Time
+	Updated time.Time
 }
 
 func ChooseHandler(w http.ResponseWriter, r *http.Request) {
