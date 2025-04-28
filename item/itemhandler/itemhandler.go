@@ -25,27 +25,30 @@ func (i Itemhandler) Choose(w http.ResponseWriter, r *http.Request) {
 }
 
 func (i Itemhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
-	//TODO: get All from database
+	its := i.Conn.QueryAllItems()
+
+	content, err := json.Marshal(its)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, err.Error())
+	}
+
+	reqResponse.Write(w, 200, content)
 }
 
 func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
-	item, err := itemFromBody(w, r)
+	it, err := itemFromBody(w, r)
 	if err != nil {
 		reqResponse.WriteErr(w, 400, err.Error())
 		return
 	}
 
-	if item.Id == 0 {
-		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Item provided"))
-		return
-	}
-
-	if len(item.Name) == 0 {
+	if len(it.Name) == 0 {
 		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
 		return
 	}
 
 	// TODO: Put into database
+	i.Conn.Insert(db.Items, []string{"Name"}, []string{it.Name})
 
 }
 
