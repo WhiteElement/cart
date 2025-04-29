@@ -53,7 +53,8 @@ func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: Put into database
-	i.Conn.Insert(db.Items, []string{"Name"}, []string{it.Name})
+
+	// i.Conn.Insert(db.Items, []string{"Name"}, []string{it.Name})
 
 }
 

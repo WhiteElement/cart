@@ -1,0 +1,99 @@
+package listhandler
+
+import (
+	"cartv2/cart/db"
+	"cartv2/cart/reqResponse"
+	"cartv2/cart/shoppinglist/shoppinglist"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+type Listhandler struct {
+	Conn db.DB
+}
+
+func (l Listhandler) Choose(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		l.getAllHandler(w, r)
+	case "POST":
+		l.newHandler(w, r)
+	case "PATCH":
+		l.updateHandler(w, r)
+	}
+}
+
+func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+	shoppinglist, err := listFromBody(w, r)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf(err.Error()))
+		return
+	}
+
+	if shoppinglist.Id == 0 {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Shoppinglist provided"))
+	}
+
+	if len(shoppinglist.Name) == 0 {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
+	}
+
+	list := l.Conn.QueryList(shoppinglist.Id)
+	// items for list
+
+	list.Name = shoppinglist.Name
+	list.Updated = time.Now()
+
+	// TODO: override
+}
+
+func (l Listhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
+	lists := l.Conn.QueryAllLists()
+
+	content, err := json.Marshal(lists)
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 200, content)
+}
+
+func (l Listhandler) newHandler(w http.ResponseWriter, r *http.Request) {
+	list, err := listFromBody(w, r)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf(err.Error()))
+		return
+	}
+
+	if len(list.Name) == 0 {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
+		return
+	}
+
+	_, err = l.Conn.Conn.Exec("INSERT INTO public.\"Lists\" (\"Name\", \"Created\", \"Updated\") VALUES ($1, $2, $2)", list.Name, time.Now())
+
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 200, []byte(""))
+}
+
+func listFromBody(w http.ResponseWriter, r *http.Request) (shoppinglist.List, error) {
+	payload, err := reqResponse.VerifyBody(w, r)
+	if err != nil {
+		return shoppinglist.List{}, err
+	}
+
+	var list shoppinglist.List
+	err = json.Unmarshal(payload, &list)
+	if err != nil {
+		return shoppinglist.List{}, err
+	}
+
+	return list, nil
+}

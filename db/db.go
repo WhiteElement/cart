@@ -2,8 +2,8 @@ package db
 
 import (
 	"cartv2/cart/item/item"
+	"cartv2/cart/shoppinglist/shoppinglist"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -11,7 +11,7 @@ import (
 )
 
 type DB struct {
-	conn *sql.DB
+	Conn *sql.DB
 }
 
 const (
@@ -34,22 +34,23 @@ func NewConn() DB {
 		log.Fatalln(err.Error())
 	}
 
-	return DB{conn: db}
+	return DB{Conn: db}
 }
 
-func (db DB) Insert(table string, cols []string, values []string) error {
-	if len(cols) != len(values) {
-		return errors.New("Number of columns and values do not match")
-	}
-
-	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, format(cols, "\""), format(values, "'"))
-	_, err := db.conn.Exec(query)
-
-	return err
-}
+// TODO: Muss umgeschrieben werden:
+// statt selbst den String zu formatieren, die parametrisierte Version benutzen
+// 	if len(cols) != len(values) {
+// 		return errors.New("Number of columns and values do not match")
+// 	}
+//
+// 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, format(cols, "\""), format(values, "'"))
+// 	_, err := db.conn.Exec(query)
+//
+// 	return err
+// }
 
 func (db DB) QueryAllItems() []item.Item {
-	rows, err := db.conn.Query(fmt.Sprintf("SELECT * FROM %s", Items))
+	rows, err := db.Conn.Query(fmt.Sprintf("SELECT * FROM %s", Items))
 	var items []item.Item
 	if err != nil {
 		return items
@@ -62,6 +63,31 @@ func (db DB) QueryAllItems() []item.Item {
 	}
 
 	return items
+}
+
+func (db DB) QueryAllLists() []shoppinglist.List {
+	rows, err := db.Conn.Query(fmt.Sprintf("SELECT * FROM %s", Lists))
+	var lists []shoppinglist.List
+	if err != nil {
+		return lists
+	}
+
+	for rows.Next() {
+		var list shoppinglist.List
+		rows.Scan(&list.Id, &list.Name, &list.Created, &list.Updated)
+		lists = append(lists, list)
+	}
+
+	return lists
+}
+
+func (db DB) QueryList(id int) shoppinglist.List {
+	row := db.Conn.QueryRow(fmt.Sprintf("SELECT * FROM %s WHERE \"Lists\".\"Id\" = %d", Lists, id))
+
+	var list shoppinglist.List
+	row.Scan(&list.Id, &list.Name, &list.Created, &list.Updated)
+
+	return list
 }
 
 func format(collection []string, surroundings string) string {

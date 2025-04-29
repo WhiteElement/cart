@@ -3,7 +3,7 @@ package main
 import (
 	"cartv2/cart/db"
 	"cartv2/cart/item/itemhandler"
-	"cartv2/cart/shoppinglist"
+	"cartv2/cart/shoppinglist/listhandler"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -34,11 +34,12 @@ func main() {
 
 	conn := db.NewConn()
 	itemhandler := itemhandler.Itemhandler{Conn: conn}
+	listhandler := listhandler.Listhandler{Conn: conn}
 
 	staticFS, _ := fs.Sub(staticFolder, "static")
 
 	http.Handle("/", http.FileServer(http.FS(staticFS)))
-	http.HandleFunc("/shoppinglist", shoppinglist.ChooseHandler)
+	http.HandleFunc("/shoppinglist", listhandler.Choose)
 	http.HandleFunc("/item", itemhandler.Choose)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
