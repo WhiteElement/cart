@@ -2,11 +2,14 @@ package listhandler
 
 import (
 	"cartv2/cart/db"
+	"cartv2/cart/item/item"
 	"cartv2/cart/reqResponse"
 	"cartv2/cart/shoppinglist/shoppinglist"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"sync"
 	"time"
 )
 
@@ -49,6 +52,42 @@ func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: override
 }
 
+func (l Listhandler) GetOneList(w http.ResponseWriter, r *http.Request) {
+	idString := r.PathValue("id")
+	id, err := strconv.Atoi(idString)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, err.Error())
+	}
+
+	var list shoppinglist.List
+	var items []item.Item
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		list = l.Conn.QueryList(id)
+		fmt.Printf("List: %+v\n", list)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		items = l.Conn.QueryItemsFromList(id)
+		fmt.Printf("Items: %+v\n", items)
+	}()
+
+	wg.Wait()
+
+	list.Items = items
+	content, err := json.Marshal(list)
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+	reqResponse.Write(w, 200, content)
+}
+
 func (l Listhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	lists := l.Conn.QueryAllLists()
 
@@ -57,7 +96,6 @@ func (l Listhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 		reqResponse.WriteErr(w, 500, err.Error())
 		return
 	}
-
 	reqResponse.Write(w, 200, content)
 }
 
@@ -80,7 +118,7 @@ func (l Listhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reqResponse.Write(w, 200, []byte(""))
+	reqResponse.Write(w, 201, []byte("Created"))
 }
 
 func listFromBody(w http.ResponseWriter, r *http.Request) (shoppinglist.List, error) {

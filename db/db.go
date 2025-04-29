@@ -37,18 +37,6 @@ func NewConn() DB {
 	return DB{Conn: db}
 }
 
-// TODO: Muss umgeschrieben werden:
-// statt selbst den String zu formatieren, die parametrisierte Version benutzen
-// 	if len(cols) != len(values) {
-// 		return errors.New("Number of columns and values do not match")
-// 	}
-//
-// 	query := fmt.Sprintf("INSERT INTO %s (%s) VALUES (%s)", table, format(cols, "\""), format(values, "'"))
-// 	_, err := db.conn.Exec(query)
-//
-// 	return err
-// }
-
 func (db DB) QueryAllItems() []item.Item {
 	rows, err := db.Conn.Query(fmt.Sprintf("SELECT * FROM %s", Items))
 	var items []item.Item
@@ -59,6 +47,24 @@ func (db DB) QueryAllItems() []item.Item {
 	for rows.Next() {
 		var item item.Item
 		rows.Scan(&item.Id, &item.Name)
+		items = append(items, item)
+	}
+
+	return items
+}
+
+func (db DB) QueryItemsFromList(id int) []item.Item {
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE \"Items\".\"ListId\" = '%d'", Items, id)
+	rows, err := db.Conn.Query(sql)
+	var items []item.Item
+	if err != nil {
+		log.Printf("Error querying items from list: id '%d', err '%s'", id, err.Error())
+		return items
+	}
+
+	for rows.Next() {
+		var item item.Item
+		rows.Scan(&item.Id, &item.Name, &item.Checked, &item.ListId)
 		items = append(items, item)
 	}
 
@@ -82,10 +88,11 @@ func (db DB) QueryAllLists() []shoppinglist.List {
 }
 
 func (db DB) QueryList(id int) shoppinglist.List {
-	row := db.Conn.QueryRow(fmt.Sprintf("SELECT * FROM %s WHERE \"Lists\".\"Id\" = %d", Lists, id))
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE \"Lists\".\"Id\" = '%d'", Lists, id)
+	row := db.Conn.QueryRow(sql)
 
 	var list shoppinglist.List
-	row.Scan(&list.Id, &list.Name, &list.Created, &list.Updated)
+	row.Scan(&list.Id, &list.Name, &list.Archived, &list.Created, &list.Updated)
 
 	return list
 }

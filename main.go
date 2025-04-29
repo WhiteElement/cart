@@ -40,6 +40,7 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.FS(staticFS)))
 	http.HandleFunc("/shoppinglist", listhandler.Choose)
+	http.HandleFunc("/shoppinglist/{id}", listhandler.GetOneList)
 	http.HandleFunc("/item", itemhandler.Choose)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
