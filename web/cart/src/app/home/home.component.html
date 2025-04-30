@@ -5,22 +5,14 @@
   </header>
 
   <section class="lists">
-    <!-- Repeat this block for each list -->
+    @for (list of this.allLists; track list.Id) {
     <div class="list-item">
       <div class="list-content">
-        <h2 class="list-title">Groceries</h2>
-        <p class="list-meta">5 items • Updated 2 days ago</p>
+        <h2 class="list-title">{{ list.Name }}</h2>
+        <p class="list-meta">x items(not impl.) • Updated {{ list.Updated }}</p>
       </div>
       <button class="delete-btn" title="Delete list">✕</button>
     </div>
-
-    <div class="list-item">
-      <div class="list-content">
-        <h2 class="list-title">Hardware Store</h2>
-        <p class="list-meta">8 items • Updated yesterday</p>
-      </div>
-      <button class="delete-btn" title="Delete list">✕</button>
-    </div>
-    <!-- End repeat -->
+    }
   </section>
 </div>

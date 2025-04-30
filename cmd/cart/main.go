@@ -40,9 +40,9 @@ func main() {
 	staticFS, _ := fs.Sub(webFolder, "web")
 
 	http.Handle("/", http.FileServer(http.FS(staticFS)))
-	http.HandleFunc("/shoppinglist", listhandler.Choose)
-	http.HandleFunc("/shoppinglist/{id}", listhandler.GetOneList)
-	http.HandleFunc("/item", itemhandler.Choose)
+	http.HandleFunc("/api/shoppinglist", listhandler.Choose)
+	http.HandleFunc("/api/shoppinglist/{id}", listhandler.GetOneList)
+	http.HandleFunc("/api/shoppingitem", itemhandler.Choose)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
