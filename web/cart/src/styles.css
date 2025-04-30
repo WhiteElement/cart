@@ -1,0 +1,25 @@
+:root {
+  --clr-dark-a0: #000000;
+  --clr-light-a0: #ffffff;
+
+  --clr-primary-a0: #21c4a4;
+  --clr-primary-a10: #4dcbae;
+  --clr-primary-a20: #6ad2b8;
+  --clr-primary-a30: #83d9c1;
+  --clr-primary-a40: #99dfcb;
+  --clr-primary-a50: #afe6d6;
+
+  --clr-surface-a0: #121212;
+  --clr-surface-a10: #282828;
+  --clr-surface-a20: #3f3f3f;
+  --clr-surface-a30: #575757;
+  --clr-surface-a40: #717171;
+  --clr-surface-a50: #8b8b8b;
+
+  --clr-surface-tonal-a0: #19211f;
+  --clr-surface-tonal-a10: #2e3634;
+  --clr-surface-tonal-a20: #454c4a;
+  --clr-surface-tonal-a30: #5d6361;
+  --clr-surface-tonal-a40: #757b79;
+  --clr-surface-tonal-a50: #8f9493;
+}

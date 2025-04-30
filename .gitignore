@@ -1,2 +1,11 @@
+# BE
 *.exe
 *.env
+cmd/cart/web/**
+
+# FE
+web/cart/.angular
+web/cart/.vscode
+web/cart/node_modules
+web/cart/dist
+web/cart/.editorconfig
