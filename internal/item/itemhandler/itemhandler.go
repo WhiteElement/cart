@@ -1,9 +1,9 @@
 package itemhandler
 
 import (
-	"cartv2/cart/db"
-	"cartv2/cart/item/item"
-	"cartv2/cart/reqResponse"
+	"cartv2/cart/internal/db"
+	"cartv2/cart/internal/item/item"
+	"cartv2/cart/internal/reqResponse"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -24,6 +24,10 @@ func (i Itemhandler) Choose(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//
+// GET
+//
+
 func (i Itemhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	its := i.Conn.QueryAllItems()
 
@@ -35,10 +39,9 @@ func (i Itemhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
 	reqResponse.Write(w, 200, content)
 }
 
-// TODO:
-// 1. secondary key für item -> Liste
-// 2. checked column einfügen
-// 3. alle EPs updaten
+//
+// POST
+//
 
 func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 	it, err := itemFromBody(w, r)
@@ -58,6 +61,10 @@ func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+//
+// PUT
+//
+
 func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	item, err := itemFromBody(w, r)
 	if err != nil {
@@ -73,6 +80,10 @@ func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO:
 	// Get from database, update, save again
 }
+
+//
+// AUX
+//
 
 func itemFromBody(w http.ResponseWriter, r *http.Request) (item.Item, error) {
 	payload, err := reqResponse.VerifyBody(w, r)

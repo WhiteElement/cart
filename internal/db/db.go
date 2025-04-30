@@ -1,8 +1,8 @@
 package db
 
 import (
-	"cartv2/cart/item/item"
-	"cartv2/cart/shoppinglist/shoppinglist"
+	"cartv2/cart/internal/item/item"
+	"cartv2/cart/internal/shoppinglist/shoppinglist"
 	"database/sql"
 	"fmt"
 	"log"

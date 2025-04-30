@@ -1,7 +1,7 @@
 package shoppinglist
 
 import (
-	"cartv2/cart/item/item"
+	"cartv2/cart/internal/item/item"
 	"time"
 )
 

@@ -1,9 +1,6 @@
 package main
 
 import (
-	"cartv2/cart/db"
-	"cartv2/cart/item/itemhandler"
-	"cartv2/cart/shoppinglist/listhandler"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -12,13 +9,17 @@ import (
 	"os"
 	"strconv"
 
+	"cartv2/cart/internal/db"
+	"cartv2/cart/internal/item/itemhandler"
+	"cartv2/cart/internal/shoppinglist/listhandler"
+
 	"github.com/joho/godotenv"
 
 	_ "github.com/lib/pq"
 )
 
-//go:embed static/*
-var staticFolder embed.FS
+//go:embed web
+var webFolder embed.FS
 
 func main() {
 	args := os.Args
@@ -36,7 +37,7 @@ func main() {
 	itemhandler := itemhandler.Itemhandler{Conn: conn}
 	listhandler := listhandler.Listhandler{Conn: conn}
 
-	staticFS, _ := fs.Sub(staticFolder, "static")
+	staticFS, _ := fs.Sub(webFolder, "web")
 
 	http.Handle("/", http.FileServer(http.FS(staticFS)))
 	http.HandleFunc("/shoppinglist", listhandler.Choose)

@@ -1,10 +1,10 @@
 package listhandler
 
 import (
-	"cartv2/cart/db"
-	"cartv2/cart/item/item"
-	"cartv2/cart/reqResponse"
-	"cartv2/cart/shoppinglist/shoppinglist"
+	"cartv2/cart/internal/db"
+	"cartv2/cart/internal/item/item"
+	"cartv2/cart/internal/reqResponse"
+	"cartv2/cart/internal/shoppinglist/shoppinglist"
 	"encoding/json"
 	"fmt"
 	"net/http"
