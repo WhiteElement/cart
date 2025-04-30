@@ -82,14 +82,12 @@ func (l Listhandler) GetOneList(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		defer wg.Done()
 		list = l.Conn.QueryList(id)
-		fmt.Printf("List: %+v\n", list)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		items = l.Conn.QueryItemsFromList(id)
-		fmt.Printf("Items: %+v\n", items)
 	}()
 
 	wg.Wait()

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type Itemhandler struct {
@@ -50,19 +51,28 @@ func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(it.Name) == 0 {
-		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
+	if it.ListId == 0 {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No ListId for corresponding Shoppinglist provided"))
 		return
 	}
 
-	// TODO: Put into database
+	if len(it.Name) == 0 {
+		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Item provided"))
+		return
+	}
 
-	// i.Conn.Insert(db.Items, []string{"Name"}, []string{it.Name})
+	_, err = i.Conn.Conn.Exec("INSERT INTO public.\"Items\" (\"Name\", \"Checked\", \"ListId\", \"Updated\") VALUES ($1, $2, $3, $4)", it.Name, it.Checked, it.ListId, time.Now())
 
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 201, []byte("Created"))
 }
 
 //
-// PUT
+// PATCH
 //
 
 func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {

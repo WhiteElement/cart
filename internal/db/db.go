@@ -46,7 +46,7 @@ func (db DB) QueryAllItems() []item.Item {
 
 	for rows.Next() {
 		var item item.Item
-		rows.Scan(&item.Id, &item.Name)
+		rows.Scan(&item.Id, &item.Name, &item.Checked, &item.ListId, &item.Updated)
 		items = append(items, item)
 	}
 
