@@ -1,7 +1,7 @@
 <div class="cart-container">
   <header class="cart-header">
     <h1>Cart</h1>
-    <button class="add-list-btn">+ Add New List</button>
+    <button (click)=newListToggle() class="add-list-btn">+ Neue Liste</button>
   </header>
 
   <section class="lists">
@@ -12,6 +12,13 @@
         <p class="list-meta">x items(not impl.) • Updated {{ list.Updated }}</p>
       </div>
       <button class="delete-btn" title="Delete list">✕</button>
+    </div>
+    }
+
+    @if (this.toggled) {
+    <div class="list-item input">
+      <input type="text" [(ngModel)]=this.newListInput />
+      <input (click)=createNewList() class="add-list-btn" type="button" value="anlegen" />
     </div>
     }
   </section>

@@ -53,7 +53,25 @@ body {
   padding: 1rem;
   border-radius: 0.75rem;
   transition: background 0.2s;
+
 }
+
+.input {
+  background-color: var(--clr-surface-a20);
+
+  input {
+    background-color: var(--clr-surface-a40);
+  }
+
+  input[type="text"] {
+    color: white;
+  }
+
+  input[type="button"] {
+  }
+}
+
+
 
 .list-item:hover {
   background-color: var(--clr-surface-a20);

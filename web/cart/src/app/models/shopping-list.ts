@@ -1,10 +1,10 @@
 import { ShoppingItem } from "./shopping-item";
 
 export interface ShoppingList {
-  Id: number,
+  Id: number | null,
   Name: string,
-  Items: ShoppingItem[],
-  Archived: boolean,
-  Created: Date,
-  Updated: Date
+  Items: ShoppingItem[] | null,
+  Archived: boolean | null,
+  Created: Date | null,
+  Updated: Date | null
 }

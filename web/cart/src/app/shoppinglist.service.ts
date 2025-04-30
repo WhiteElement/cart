@@ -15,4 +15,23 @@ export class ShoppinglistService {
       observe: 'response'
     });
   }
+
+  createNew(name: string): Observable<HttpResponse<string>> {
+    const list: ShoppingList = {
+      Name: name,
+      Id: null,
+      Items: null,
+      Archived: null,
+      Created: null,
+      Updated: null,
+    };
+
+    return this.http.post(this.baseUrl, JSON.stringify(list), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      responseType: 'text',
+      observe: 'response',
+    });
+  }
 }
