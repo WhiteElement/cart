@@ -50,7 +50,6 @@ func main() {
 		port = 420
 	}
 
-	// TODO: postgres nur für bestimmte IPs freigeben
 	log.Printf("Listening on port %d\n", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }

@@ -71,20 +71,24 @@ func (db DB) QueryItemsFromList(id int) []item.Item {
 	return items
 }
 
-func (db DB) QueryAllLists() []shoppinglist.List {
+func (db DB) QueryAllLists() ([]shoppinglist.List, error) {
 	rows, err := db.Conn.Query(fmt.Sprintf("SELECT * FROM %s", Lists))
 	var lists []shoppinglist.List
 	if err != nil {
-		return lists
+		return lists, err
 	}
 
 	for rows.Next() {
 		var list shoppinglist.List
-		rows.Scan(&list.Id, &list.Name, &list.Created, &list.Updated)
+		err = rows.Scan(&list.Id, &list.Name, &list.Archived, &list.Created, &list.Updated)
 		lists = append(lists, list)
 	}
 
-	return lists
+	if err != nil {
+		return lists, err
+	}
+
+	return lists, nil
 }
 
 func (db DB) QueryList(id int) shoppinglist.List {

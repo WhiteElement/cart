@@ -44,12 +44,27 @@ func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	list := l.Conn.QueryList(shoppinglist.Id)
-	// items for list
 
 	list.Name = shoppinglist.Name
 	list.Updated = time.Now()
 
-	// TODO: override
+	err = l.updateList(w, list)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 200, []byte("Updated"))
+}
+
+func (l Listhandler) updateList(w http.ResponseWriter, newList shoppinglist.List) error {
+	_, err := l.Conn.Conn.Exec("UPDATE public.\"Lists\" SET (\"Name\", \"Updated\") = ($1, $2) WHERE \"Id\" = $3", newList.Name, newList.Updated, newList.Id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (l Listhandler) GetOneList(w http.ResponseWriter, r *http.Request) {
@@ -85,11 +100,12 @@ func (l Listhandler) GetOneList(w http.ResponseWriter, r *http.Request) {
 		reqResponse.WriteErr(w, 500, err.Error())
 		return
 	}
+
 	reqResponse.Write(w, 200, content)
 }
 
 func (l Listhandler) getAllHandler(w http.ResponseWriter, r *http.Request) {
-	lists := l.Conn.QueryAllLists()
+	lists, err := l.Conn.QueryAllLists()
 
 	content, err := json.Marshal(lists)
 	if err != nil {
