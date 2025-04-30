@@ -43,6 +43,8 @@ func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
 	}
 
+	// TODO:
+	// should we even query before updating?
 	list := l.Conn.QueryList(shoppinglist.Id)
 
 	list.Name = shoppinglist.Name

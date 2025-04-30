@@ -87,13 +87,31 @@ func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO:
-	// Get from database, update, save again
+	item.Updated = time.Now()
+	err = i.updateItem(item)
+	if err != nil {
+		reqResponse.WriteErr(w, 400, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 200, []byte("Updated"))
+
 }
 
 //
 // AUX
 //
+
+func (i Itemhandler) updateItem(item item.Item) error {
+	_, err := i.Conn.Conn.Exec("UPDATE public.\"Items\" SET (\"Name\", \"Checked\", \"Updated\") = ($1, $2, $3) WHERE \"Id\" = $4", item.Name, item.Checked, item.Updated, item.Id)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
 
 func itemFromBody(w http.ResponseWriter, r *http.Request) (item.Item, error) {
 	payload, err := reqResponse.VerifyBody(w, r)
