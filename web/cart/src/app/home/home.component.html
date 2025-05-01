@@ -6,7 +6,7 @@
 
   <section class="lists">
     @for (list of this.activeLists; track list.Id) {
-    <div class="list-item">
+    <div (click)="toDetailsPage(list.Id)" class="list-item">
       <div class="list-content">
         <h2 class="list-title">{{ list.Name }}</h2>
         <p class="list-meta">Updated {{ list.Updated | date:"HH:mm (dd. MMM)" }}</p>

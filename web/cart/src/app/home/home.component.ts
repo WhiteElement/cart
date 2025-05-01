@@ -3,6 +3,7 @@ import { ShoppingList } from '../models/shopping-list';
 import { ShoppinglistService } from '../shoppinglist.service';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,7 @@ export class HomeComponent implements OnInit {
   toggled = false;
   newListInput: string = '';
 
-  constructor(private shoppingListService: ShoppinglistService) {
+  constructor(private shoppingListService: ShoppinglistService, private router: Router) {
     this.activeLists = null;
     this.archivedLists = null;
   }
@@ -76,5 +77,9 @@ export class HomeComponent implements OnInit {
         console.error("Error creating new List", res.body)
       }
     });
+  }
+
+  toDetailsPage(id: number | null): void {
+    this.router.navigate(['/list', id]);
   }
 }

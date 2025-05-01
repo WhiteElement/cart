@@ -16,6 +16,12 @@ export class ShoppinglistService {
     });
   }
 
+  getOne(id: string): Observable<HttpResponse<ShoppingList>> {
+    return this.http.get<ShoppingList>(`${this.baseUrl}/${id}`, {
+      observe: 'response'
+    });
+  }
+
   createNew(name: string): Observable<HttpResponse<string>> {
     const list: ShoppingList = {
       Name: name,
