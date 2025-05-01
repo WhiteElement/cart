@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ShoppingList } from '../models/shopping-list';
 import { ShoppinglistService } from '../shoppinglist.service';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

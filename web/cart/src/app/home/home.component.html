@@ -9,7 +9,7 @@
     <div class="list-item">
       <div class="list-content">
         <h2 class="list-title">{{ list.Name }}</h2>
-        <p class="list-meta">x items(not impl.) • Updated {{ list.Updated }}</p>
+        <p class="list-meta">Updated {{ list.Updated | date:"HH:mm (dd. MMM)" }}</p>
       </div>
       <button (click)="archivedList(list.Id)" class="delete-btn" title="Delete list">✕</button>
     </div>

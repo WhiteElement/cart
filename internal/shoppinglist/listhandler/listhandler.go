@@ -43,11 +43,9 @@ func (l Listhandler) patchHandler(w http.ResponseWriter, r *http.Request) {
 	args := make(map[string]interface{})
 
 	if len(shoppinglist.Name) != 0 {
-		fmt.Println("Name is nil")
 		args[fmt.Sprintf("\"Name\" = $%d", len(args)+1)] = shoppinglist.Name
 	}
 	if shoppinglist.Archived {
-		fmt.Println("Archived is true")
 		args[fmt.Sprintf("\"Archived\" = $%d", len(args)+1)] = shoppinglist.Archived
 	}
 
