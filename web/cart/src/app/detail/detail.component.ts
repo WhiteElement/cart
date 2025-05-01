@@ -3,16 +3,21 @@ import { ActivatedRoute } from '@angular/router';
 import { ShoppinglistService } from '../shoppinglist.service';
 import { ShoppingItemService } from '../shopping-item.service';
 import { ShoppingList } from '../models/shopping-list';
+import { ShoppingItem } from '../models/shopping-item';
+import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-detail',
   standalone: true,
-  imports: [],
+  imports: [DatePipe, FormsModule],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.css'
 })
 export class DetailComponent implements OnInit {
   list: ShoppingList = {} as ShoppingList;
+  activeItems: ShoppingItem[] = [];
+  checkedItems: ShoppingItem[] = [];
 
   constructor(private route: ActivatedRoute, private shoppinglistService: ShoppinglistService, private shoppingItemService: ShoppingItemService) { }
 
@@ -25,9 +30,37 @@ export class DetailComponent implements OnInit {
           if (statusCode.startsWith("2")) {
             if (res.body) {
               this.list = res.body;
+
+              if (this.list.Items) {
+                this.activeItems = this.list.Items.filter(i => !i.Checked);
+                this.checkedItems = this.list.Items.filter(i => i.Checked);
+                console.log("active", this.activeItems, "checked", this.checkedItems);
+              }
             }
           }
         })
+      }
+    });
+  }
+
+  newItem(): void {
+  }
+
+  toggleCheck(item: ShoppingItem): void {
+    if (item.Checked) {
+      item.Checked = false;
+      this.activeItems.push(item);
+      this.checkedItems = this.checkedItems.filter(i => i.Id !== item.Id);
+    } else {
+      item.Checked = true;
+      this.checkedItems.push(item);
+      this.activeItems = this.activeItems.filter(i => i.Id !== item.Id);
+    }
+
+    this.shoppingItemService.patchItem(item).subscribe(res => {
+      const statusCode = res.status.toString();
+      if (!statusCode.startsWith("2")) {
+        console.error("Error patching Item", res.body);
       }
     });
   }

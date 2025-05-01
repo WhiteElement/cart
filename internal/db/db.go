@@ -64,7 +64,7 @@ func (db DB) QueryItemsFromList(id int) []item.Item {
 
 	for rows.Next() {
 		var item item.Item
-		rows.Scan(&item.Id, &item.Name, &item.Checked, &item.ListId)
+		rows.Scan(&item.Id, &item.Name, &item.Checked, &item.ListId, &item.Updated)
 		items = append(items, item)
 	}
 
