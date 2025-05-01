@@ -11,19 +11,24 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  allLists: ShoppingList[] | null;
+  activeLists: ShoppingList[] | null;
+  archivedLists: ShoppingList[] | null;
   toggled = false;
   newListInput: string = '';
 
   constructor(private shoppingListService: ShoppinglistService) {
-    this.allLists = null;
+    this.activeLists = null;
+    this.archivedLists = null;
   }
 
   ngOnInit() {
     this.shoppingListService.getAll().subscribe(res => {
       const statusCode = res.status.toString();
       if (statusCode.startsWith("2")) {
-        this.allLists = res.body;
+        if (res.body) {
+          this.activeLists = res.body.filter(l => !l.Archived)
+          this.archivedLists = res.body.filter(l => l.Archived)
+        }
       }
       else {
         console.error("Could not get shoppinglists", res.body);
@@ -50,6 +55,20 @@ export class HomeComponent implements OnInit {
         this.newListInput = '';
         this.toggled = false;
 
+        this.ngOnInit();
+      }
+      else {
+        console.error("Error creating new List", res.body)
+      }
+    });
+  }
+
+  // archive = delete
+  archivedList(id: number | null): void {
+    const archivedList: ShoppingList = { Id: id, Archived: true, Name: null, Created: null, Updated: null, Items: null };
+    this.shoppingListService.patch(archivedList).subscribe(res => {
+      const statusCode = res.status.toString();
+      if (statusCode.startsWith("2")) {
         this.ngOnInit();
       }
       else {

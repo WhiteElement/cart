@@ -34,4 +34,14 @@ export class ShoppinglistService {
       observe: 'response',
     });
   }
+
+  patch(list: ShoppingList): Observable<HttpResponse<string>> {
+    return this.http.patch(this.baseUrl, JSON.stringify(list), {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      responseType: 'text',
+      observe: 'response',
+    });
+  }
 }

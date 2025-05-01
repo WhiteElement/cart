@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -24,11 +25,11 @@ func (l Listhandler) Choose(w http.ResponseWriter, r *http.Request) {
 	case "POST":
 		l.newHandler(w, r)
 	case "PATCH":
-		l.updateHandler(w, r)
+		l.patchHandler(w, r)
 	}
 }
 
-func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
+func (l Listhandler) patchHandler(w http.ResponseWriter, r *http.Request) {
 	shoppinglist, err := listFromBody(w, r)
 	if err != nil {
 		reqResponse.WriteErr(w, 400, fmt.Sprintf(err.Error()))
@@ -39,18 +40,21 @@ func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Id for Shoppinglist provided"))
 	}
 
-	if len(shoppinglist.Name) == 0 {
-		reqResponse.WriteErr(w, 400, fmt.Sprintf("No Name for Shoppinglist provided"))
+	args := make(map[string]interface{})
+
+	if len(shoppinglist.Name) != 0 {
+		fmt.Println("Name is nil")
+		args[fmt.Sprintf("\"Name\" = $%d", len(args)+1)] = shoppinglist.Name
+	}
+	if shoppinglist.Archived {
+		fmt.Println("Archived is true")
+		args[fmt.Sprintf("\"Archived\" = $%d", len(args)+1)] = shoppinglist.Archived
 	}
 
-	// TODO:
-	// should we even query before updating?
-	list := l.Conn.QueryList(shoppinglist.Id)
+	shoppinglist.Updated = time.Now()
+	args[fmt.Sprintf("\"Updated\" = $%d", len(args)+1)] = shoppinglist.Updated
 
-	list.Name = shoppinglist.Name
-	list.Updated = time.Now()
-
-	err = l.updateList(w, list)
+	err = l.updateList(args, shoppinglist.Id)
 	if err != nil {
 		reqResponse.WriteErr(w, 400, err.Error())
 		return
@@ -59,8 +63,18 @@ func (l Listhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 	reqResponse.Write(w, 200, []byte("Updated"))
 }
 
-func (l Listhandler) updateList(w http.ResponseWriter, newList shoppinglist.List) error {
-	_, err := l.Conn.Conn.Exec("UPDATE public.\"Lists\" SET (\"Name\", \"Updated\") = ($1, $2) WHERE \"Id\" = $3", newList.Name, newList.Updated, newList.Id)
+func (l Listhandler) updateList(args map[string]interface{}, listId int) error {
+	var keys []string
+	values := []interface{}{}
+
+	for key, value := range args {
+		keys = append(keys, key)
+		values = append(values, value)
+	}
+
+	sql := fmt.Sprintf("UPDATE public.\"Lists\" SET %s WHERE \"Id\" = $%d\n", strings.Join(keys, ", "), len(values)+1)
+	values = append(values, listId)
+	_, err := l.Conn.Conn.Exec(sql, values...)
 
 	if err != nil {
 		return err
