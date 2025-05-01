@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -22,6 +23,13 @@ func (i Itemhandler) Choose(w http.ResponseWriter, r *http.Request) {
 		i.newHandler(w, r)
 	case "PATCH":
 		i.updateHandler(w, r)
+	}
+}
+
+func (i Itemhandler) ChooseSingle(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "DELETE":
+		i.deleteHandler(w, r)
 	}
 }
 
@@ -102,6 +110,29 @@ func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 // AUX
 //
 
+func (i Itemhandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	convId, err := strconv.Atoi(id)
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+
+	// TODO: Update Updated bei der Liste
+	_, err = i.Conn.Conn.Exec("DELETE FROM public.\"Items\" WHERE \"Id\" = $1", convId)
+	if err != nil {
+		reqResponse.WriteErr(w, 500, err.Error())
+		return
+	}
+
+	reqResponse.Write(w, 200, []byte("Deleted"))
+}
+
+//
+// AUX
+//
+
+// TODO: Update Updated bei der Liste
 func (i Itemhandler) updateItem(item item.Item) error {
 	_, err := i.Conn.Conn.Exec("UPDATE public.\"Items\" SET (\"Name\", \"Checked\", \"Updated\") = ($1, $2, $3) WHERE \"Id\" = $4", item.Name, item.Checked, item.Updated, item.Id)
 

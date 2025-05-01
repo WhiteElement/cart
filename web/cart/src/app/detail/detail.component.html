@@ -15,7 +15,7 @@
       <li lass="item">
         <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">
         <span>{{ item.Name }}</span>
-        <button class="delete-btn">✕</button>
+        <button (click)="delete(item.Id)" class="delete-btn">✕</button>
       </li>
       }
     </ul>
@@ -31,7 +31,7 @@
       <li class="item">
         <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">
         <span>Name: {{ item.Name }}</span>
-        <button class="delete-btn">✕</button>
+        <button (click)="delete(item.Id)" class="delete-btn">✕</button>
       </li>
       }
     </ul>

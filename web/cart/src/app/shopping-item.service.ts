@@ -33,4 +33,10 @@ export class ShoppingItemService {
     });
   }
 
+  deleteItem(itemId: number): Observable<string> {
+    return this.http.delete(`${this.baseUrl}/${itemId}`, {
+      responseType: 'text',
+      observe: 'body'
+    });
+  }
 }

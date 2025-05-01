@@ -34,7 +34,6 @@ export class DetailComponent implements OnInit {
               if (this.list.Items) {
                 this.activeItems = this.list.Items.filter(i => !i.Checked);
                 this.checkedItems = this.list.Items.filter(i => i.Checked);
-                console.log("active", this.activeItems, "checked", this.checkedItems);
               }
             }
           }
@@ -63,5 +62,17 @@ export class DetailComponent implements OnInit {
         console.error("Error patching Item", res.body);
       }
     });
+  }
+
+  delete(itemId: number | null) {
+    if (itemId) {
+      this.shoppingItemService.deleteItem(itemId).subscribe(res => {
+        this.checkedItems = this.checkedItems.filter(i => i.Id !== itemId);
+        this.activeItems = this.activeItems.filter(i => i.Id !== itemId);
+        if (this.list.Items) {
+          this.list.Items = this.list.Items.filter(i => i.Id !== itemId);
+        }
+      });
+    }
   }
 }

@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/api/shoppinglist", listhandler.Choose)
 	http.HandleFunc("/api/shoppinglist/{id}", listhandler.GetOneList)
 	http.HandleFunc("/api/shoppingitem", itemhandler.Choose)
+	http.HandleFunc("/api/shoppingitem/{id}", itemhandler.ChooseSingle)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
