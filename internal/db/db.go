@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 type DB struct {
@@ -35,6 +36,21 @@ func NewConn() DB {
 	}
 
 	return DB{Conn: db}
+}
+
+func (db DB) UpdateList(listId int, ts time.Time) error {
+	_, err := db.Conn.Exec("UPDATE public.\"Lists\" SET \"Updated\" = $1 WHERE \"Id\" = $2", ts, listId)
+	return err
+}
+
+func (db DB) QueryItem(id int) (item.Item, error) {
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE \"Items\".\"Id\" = '%d'", Items, id)
+	row := db.Conn.QueryRow(sql)
+
+	var item item.Item
+	err := row.Scan(&item.Id, &item.Name, &item.Checked, &item.ListId, &item.Updated)
+
+	return item, err
 }
 
 func (db DB) QueryAllItems() []item.Item {

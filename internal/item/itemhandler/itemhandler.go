@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -95,15 +96,30 @@ func (i Itemhandler) updateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var wg sync.WaitGroup
+
 	item.Updated = time.Now()
-	err = i.updateItem(item)
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = i.Conn.UpdateList(item.ListId, item.Updated)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = i.updateItem(item)
+	}()
+
+	wg.Wait()
+
 	if err != nil {
 		reqResponse.WriteErr(w, 400, err.Error())
 		return
 	}
 
 	reqResponse.Write(w, 200, []byte("Updated"))
-
 }
 
 //
@@ -118,8 +134,23 @@ func (i Itemhandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Update Updated bei der Liste
-	_, err = i.Conn.Conn.Exec("DELETE FROM public.\"Items\" WHERE \"Id\" = $1", convId)
+	item, err := i.Conn.QueryItem(convId)
+
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		err = i.Conn.UpdateList(item.ListId, time.Now())
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		_, err = i.Conn.Conn.Exec("DELETE FROM public.\"Items\" WHERE \"Id\" = $1", convId)
+	}()
+
+	wg.Wait()
 	if err != nil {
 		reqResponse.WriteErr(w, 500, err.Error())
 		return
@@ -132,7 +163,6 @@ func (i Itemhandler) deleteHandler(w http.ResponseWriter, r *http.Request) {
 // AUX
 //
 
-// TODO: Update Updated bei der Liste
 func (i Itemhandler) updateItem(item item.Item) error {
 	_, err := i.Conn.Conn.Exec("UPDATE public.\"Items\" SET (\"Name\", \"Checked\", \"Updated\") = ($1, $2, $3) WHERE \"Id\" = $4", item.Name, item.Checked, item.Updated, item.Id)
 

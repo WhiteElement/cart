@@ -58,7 +58,9 @@ export class DetailComponent implements OnInit {
 
     this.shoppingItemService.patchItem(item).subscribe(res => {
       const statusCode = res.status.toString();
-      if (!statusCode.startsWith("2")) {
+      if (statusCode.startsWith("2")) {
+        this.list.Updated = new Date();
+      } else {
         console.error("Error patching Item", res.body);
       }
     });
@@ -69,6 +71,7 @@ export class DetailComponent implements OnInit {
       this.shoppingItemService.deleteItem(itemId).subscribe(res => {
         this.checkedItems = this.checkedItems.filter(i => i.Id !== itemId);
         this.activeItems = this.activeItems.filter(i => i.Id !== itemId);
+        this.list.Updated = new Date();
         if (this.list.Items) {
           this.list.Items = this.list.Items.filter(i => i.Id !== itemId);
         }
