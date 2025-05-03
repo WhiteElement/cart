@@ -19,6 +19,9 @@ export class DetailComponent implements OnInit {
   activeItems: ShoppingItem[] = [];
   checkedItems: ShoppingItem[] = [];
 
+  toggleNew: boolean = false;
+  newItemInput: string = '';
+
   constructor(private route: ActivatedRoute, private shoppinglistService: ShoppinglistService, private shoppingItemService: ShoppingItemService) { }
 
   ngOnInit(): void {
@@ -42,7 +45,28 @@ export class DetailComponent implements OnInit {
     });
   }
 
-  newItem(): void {
+  showNew(): void {
+    if (this.toggleNew) {
+      this.toggleNew = false;
+    } else {
+      this.toggleNew = true;
+    }
+  }
+
+  createNewItem(): void {
+    if (this.newItemInput !== '') {
+      if (this.list.Id) {
+        this.shoppingItemService.newItem(this.newItemInput, this.list.Id, false).subscribe(res => {
+          const statusCode = res.status.toString();
+          if (statusCode.startsWith("2")) {
+            this.newItemInput = '';
+            this.toggleNew = false;
+            this.ngOnInit();
+          }
+        });
+      }
+    }
+
   }
 
   toggleCheck(item: ShoppingItem): void {

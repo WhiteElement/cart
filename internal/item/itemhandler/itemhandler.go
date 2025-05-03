@@ -70,17 +70,34 @@ func (i Itemhandler) newHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = i.Conn.Conn.Exec("INSERT INTO public.\"Items\" (\"Name\", \"Checked\", \"ListId\", \"Updated\") VALUES ($1, $2, $3, $4)", it.Name, it.Checked, it.ListId, time.Now())
+	var wg sync.WaitGroup
 
-	if err != nil {
-		reqResponse.WriteErr(w, 500, err.Error())
-		return
-	}
+	wg.Add(1)
+	go func() {
+		err = i.Conn.UpdateList(it.ListId, time.Now())
+		defer wg.Done()
+		if err != nil {
+			reqResponse.WriteErr(w, 400, err.Error())
+			return
+		}
+	}()
 
+	wg.Add(1)
+	go func() {
+		_, err = i.Conn.Conn.Exec("INSERT INTO public.\"Items\" (\"Name\", \"Checked\", \"ListId\", \"Updated\") VALUES ($1, $2, $3, $4)", it.Name, it.Checked, it.ListId, time.Now())
+		defer wg.Done()
+
+		if err != nil {
+			reqResponse.WriteErr(w, 500, err.Error())
+			return
+		}
+	}()
+
+	wg.Wait()
 	reqResponse.Write(w, 201, []byte("Created"))
 }
 
-//
+//()
 // PATCH
 //
 

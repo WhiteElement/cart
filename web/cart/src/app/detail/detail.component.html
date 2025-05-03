@@ -12,10 +12,16 @@
     <h2>Active Items</h2>
     <ul>
       @for (item of this.activeItems; track item.Id) {
-      <li lass="item">
+      <li class="item">
         <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">
         <span>{{ item.Name }}</span>
         <button (click)="delete(item.Id)" class="delete-btn">✕</button>
+      </li>
+      }
+      @if (this.toggleNew) {
+      <li class="item">
+        <input type="text" [(ngModel)]=this.newItemInput />
+        <input (click)=createNewItem() type="button" value="anlegen" />
       </li>
       }
     </ul>
@@ -38,7 +44,7 @@
   </section>
 
   <footer class="actions">
-    <button (click)=newItem() class="primary-btn">Add Item</button>
+    <button (click)=showNew() class="primary-btn">Add Item</button>
     <button class="secondary-btn">Import Previous List</button>
   </footer>
 </div>
