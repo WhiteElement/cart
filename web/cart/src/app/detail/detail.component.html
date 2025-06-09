@@ -1,26 +1,30 @@
 <div class="list-detail">
 
   <header class="list-header">
-    <h1>{{ this.list.Name }}</h1>
+    @if (this.list(); as list) {
+    <h1>{{ list.Name }}</h1>
     <div class="metadata">
-      <span>Erstellt: {{ this.list.Created | date:"HH:mm (dd. MMM)" }}</span>
-      <span>Updated: {{ this.list.Updated | date:"HH:mm (dd. MMM)" }}</span>
+      <span>Erstellt: {{ list.Created | date:"HH:mm (dd. MMM)" }}</span>
+      <span>Updated: {{ list.Updated | date:"HH:mm (dd. MMM)" }}</span>
     </div>
+    }
   </header>
 
   <section class="items">
     <h2>Active Items</h2>
     <ul>
-      @for (item of this.activeItems; track item.Id) {
+      @if (this.activeItems(); as actives) {
+      @for (item of actives; track item.Id) {
       <li class="item">
         <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">
         <span>{{ item.Name }}</span>
         <button (click)="delete(item.Id)" class="delete-btn">✕</button>
       </li>
       }
-      @if (this.toggleNew) {
+      }
+      @if (this.toggleNew()) {
       <li class="item">
-        <input type="text" [(ngModel)]=this.newItemInput />
+        <input type="text" [(ngModel)]=this.newItemInput (ngModelChange)=this.newItemInput.set($event) />
         <input (click)=createNewItem() type="button" value="anlegen" />
       </li>
       }
@@ -30,18 +34,18 @@
   <hr class="divider" />
 
   <!-- Checked Items -->
-  <section class="items inactive">
-    <h2>Inactive Items</h2>
-    <ul>
-      @for (item of this.checkedItems; track item.Id) {
-      <li class="item">
-        <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">
-        <span>Name: {{ item.Name }}</span>
-        <button (click)="delete(item.Id)" class="delete-btn">✕</button>
-      </li>
-      }
-    </ul>
-  </section>
+  <!--<section class="items inactive">-->
+  <!--  <h2>Inactive Items</h2>-->
+  <!--  <ul>-->
+  <!--    @for (item of this.checkedItems; track item.Id) {-->
+  <!--    <li class="item">-->
+  <!--      <input type="checkbox" [checked]=item.Checked (change)="toggleCheck(item)">-->
+  <!--      <span>Name: {{ item.Name }}</span>-->
+  <!--      <button (click)="delete(item.Id)" class="delete-btn">✕</button>-->
+  <!--    </li>-->
+  <!--    }-->
+  <!--  </ul>-->
+  <!--</section>-->
 
   <footer class="actions">
     <button (click)=showNew() class="primary-btn">Add Item</button>

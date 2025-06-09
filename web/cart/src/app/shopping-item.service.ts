@@ -1,6 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { ShoppingItem } from './models/shopping-item';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class ShoppingItemService {
 
   constructor(private http: HttpClient) { }
 
-  newItem(name: string, listId: number, checked: boolean): Observable<HttpResponse<string>> {
+  newItem(name: string, listId: number, checked: boolean): Observable<string | undefined> {
     const item: ShoppingItem = { Id: null, Name: name, ListId: listId, Checked: checked, Updated: null };
 
     return this.http.post(this.baseUrl, JSON.stringify(item), {
@@ -19,8 +19,12 @@ export class ShoppingItemService {
         'Content-Type': 'application/json'
       },
       responseType: 'text',
-      observe: 'response'
-    });
+    }).pipe(
+      catchError((err) => {
+        console.error(`Error creating new Item: ${err}`);
+        return of(undefined);
+      })
+    );
   }
 
   patchItem(item: ShoppingItem): Observable<HttpResponse<string>> {

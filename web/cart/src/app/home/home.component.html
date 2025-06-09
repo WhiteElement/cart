@@ -1,11 +1,12 @@
 <div class="cart-container">
   <header class="cart-header">
     <h1>Cart</h1>
-    <button (click)=newListToggle() class="add-list-btn">+ Neue Liste</button>
+    <!--<button (click)=newListToggle() class="add-list-btn">+ Neue Liste</button>-->
   </header>
 
   <section class="lists">
-    @for (list of this.activeLists; track list.Id) {
+    @if (this.activeLists(); as actives) {
+    @for (list of actives; track list.Id) {
     <div (click)="toDetailsPage(list.Id)" class="list-item">
       <div class="list-content">
         <h2 class="list-title">{{ list.Name }}</h2>
@@ -14,12 +15,13 @@
       <button (click)="archivedList(list.Id)" class="delete-btn" title="Delete list">✕</button>
     </div>
     }
-
-    @if (this.toggled) {
-    <div class="list-item input">
-      <input type="text" [(ngModel)]=this.newListInput />
-      <input (click)=createNewList() class="add-list-btn" type="button" value="anlegen" />
-    </div>
     }
+
+    <!--@if (this.toggled) {-->
+    <!--<div class="list-item input">-->
+    <!--  <input type="text" [(ngModel)]=this.newListInput />-->
+    <!--  <input (click)=createNewList() class="add-list-btn" type="button" value="anlegen" />-->
+    <!--</div>-->
+    <!--}-->
   </section>
 </div>

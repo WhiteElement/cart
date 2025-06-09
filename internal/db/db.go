@@ -38,6 +38,31 @@ func NewConn() DB {
 	return DB{Conn: db}
 }
 
+func (db DB) QueryLastWrite() time.Time {
+	rows, err := db.Conn.Query("SELECT * FROM public.\"Sync\"")
+	if err != nil {
+		return time.Time{}
+	}
+
+	var lastWrite time.Time
+	if rows == nil {
+		lastWrite = time.Now()
+		db.Conn.Exec("INSERT INTO public.\"Sync\" (\"LastWrite\") VALUES ($1)", lastWrite)
+	}
+
+	rowsFound := 0
+	for rows.Next() {
+		rowsFound++
+		if rowsFound > 1 {
+			log.Printf("WARNING: More than one lastWrite Server Timestamp in Database found")
+		}
+
+		rows.Scan(&lastWrite)
+	}
+
+	return lastWrite
+}
+
 func (db DB) UpdateList(listId int, ts time.Time) error {
 	_, err := db.Conn.Exec("UPDATE public.\"Lists\" SET \"Updated\" = $1 WHERE \"Id\" = $2", ts, listId)
 	return err

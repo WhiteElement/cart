@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, computed, inject, Signal, effect } from '@angular/core';
 import { ShoppingList } from '../models/shopping-list';
 import { ShoppinglistService } from '../shoppinglist.service';
 import { FormsModule } from '@angular/forms';
@@ -12,39 +12,39 @@ import { Router } from '@angular/router';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit {
-  activeLists: ShoppingList[] | null;
-  archivedLists: ShoppingList[] | null;
-  toggled = false;
+export class HomeComponent {
+  private router = inject(Router);
+  private shoppingListService = inject(ShoppinglistService);
+
+  private allLists = this.shoppingListService.allLists;
+  activeLists = computed(() => { return this.allLists()?.filter(l => !l.Archived); });
+  archivedLists = computed(() => { return this.allLists()?.filter(l => l.Archived); });
+  //toggled = false;
   newListInput: string = '';
 
-  constructor(private shoppingListService: ShoppinglistService, private router: Router) {
-    this.activeLists = null;
-    this.archivedLists = null;
-  }
 
-  ngOnInit() {
-    this.shoppingListService.getAll().subscribe(res => {
-      const statusCode = res.status.toString();
-      if (statusCode.startsWith("2")) {
-        if (res.body) {
-          this.activeLists = res.body.filter(l => !l.Archived)
-          this.archivedLists = res.body.filter(l => l.Archived)
-        }
-      }
-      else {
-        console.error("Could not get shoppinglists", res.body);
-      }
-    });
-  }
+  //ngOnInit() {
+  //  this.shoppingListService.getAll().subscribe(res => {
+  //    const statusCode = res.status.toString();
+  //    if (statusCode.startsWith("2")) {
+  //      if (res.body) {
+  //        this.activeLists = res.body.filter(l => !l.Archived)
+  //        this.archivedLists = res.body.filter(l => l.Archived)
+  //      }
+  //    }
+  //    else {
+  //      console.error("Could not get shoppinglists", res.body);
+  //    }
+  //  });
+  //}
 
-  newListToggle(): void {
-    if (this.toggled) {
-      this.toggled = false;
-    } else {
-      this.toggled = true;
-    }
-  }
+  //newListToggle(): void {
+  //  if (this.toggled) {
+  //    this.toggled = false;
+  //  } else {
+  //    this.toggled = true;
+  //  }
+  //}
 
   createNewList(): void {
     if (this.newListInput === '') {
@@ -55,9 +55,9 @@ export class HomeComponent implements OnInit {
       const statusCode = res.status.toString();
       if (statusCode.startsWith("2")) {
         this.newListInput = '';
-        this.toggled = false;
+        //this.toggled = false;
 
-        this.ngOnInit();
+        //this.ngOnInit();
       }
       else {
         console.error("Error creating new List", res.body)
@@ -71,7 +71,7 @@ export class HomeComponent implements OnInit {
     this.shoppingListService.patch(archivedList).subscribe(res => {
       const statusCode = res.status.toString();
       if (statusCode.startsWith("2")) {
-        this.ngOnInit();
+        //this.ngOnInit();
       }
       else {
         console.error("Error creating new List", res.body)

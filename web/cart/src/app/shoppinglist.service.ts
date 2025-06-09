@@ -1,25 +1,31 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { ShoppingList } from './models/shopping-list';
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShoppinglistService {
+  private http = inject(HttpClient);
   private baseUrl = "api/shoppinglist";
-  constructor(private http: HttpClient) { }
 
-  getAll(): Observable<HttpResponse<ShoppingList[]>> {
-    return this.http.get<ShoppingList[]>(this.baseUrl, {
-      observe: 'response'
-    });
+  private getAll(): Observable<ShoppingList[]> {
+    return this.http.get<ShoppingList[]>(this.baseUrl);
   }
 
-  getOne(id: string): Observable<HttpResponse<ShoppingList>> {
-    return this.http.get<ShoppingList>(`${this.baseUrl}/${id}`, {
-      observe: 'response'
-    });
+  readonly allLists = toSignal(this.getAll());
+  private currentList = signal<ShoppingList | undefined>(undefined);
+  readonly activeList = this.currentList.asReadonly();
+
+  updateList(id: string): void {
+    this.http.get<ShoppingList>(`${this.baseUrl}/${id}`).pipe(
+      catchError((err) => {
+        console.error(`Error getting shoppinglist: ${err}`);
+        return of(undefined);
+      })
+    ).subscribe(res => { this.currentList.set(res) });
   }
 
   createNew(name: string): Observable<HttpResponse<string>> {

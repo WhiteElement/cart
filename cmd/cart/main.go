@@ -12,6 +12,7 @@ import (
 	"cartv2/cart/internal/db"
 	"cartv2/cart/internal/item/itemhandler"
 	"cartv2/cart/internal/shoppinglist/listhandler"
+	"cartv2/cart/internal/synchandler"
 
 	"github.com/joho/godotenv"
 
@@ -36,6 +37,7 @@ func main() {
 	conn := db.NewConn()
 	itemhandler := itemhandler.Itemhandler{Conn: conn}
 	listhandler := listhandler.Listhandler{Conn: conn}
+	synchandler := synchandler.SyncHandler{Conn: conn}
 
 	staticFS, _ := fs.Sub(webFolder, "web")
 
@@ -44,6 +46,7 @@ func main() {
 	http.HandleFunc("/api/shoppinglist/{id}", listhandler.GetOneList)
 	http.HandleFunc("/api/shoppingitem", itemhandler.Choose)
 	http.HandleFunc("/api/shoppingitem/{id}", itemhandler.ChooseSingle)
+	http.HandleFunc("/api/sync", synchandler.Choose)
 
 	port, err := strconv.Atoi(os.Getenv("PORT"))
 	if err != nil {
